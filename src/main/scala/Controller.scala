@@ -12,9 +12,9 @@ class Controller extends Module {
     val PREQ = Output(Bool())
     val PACCEPT = Input(Bool())
     val PDENY = Input(Bool())
-    val PRESETn = Output(Bool())
+    val RESETn = Output(Bool())
   })
 
   val STATE = RegInit(p_RESET)
-  
+
 }
