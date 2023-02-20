@@ -19,10 +19,10 @@ class Controller extends Module {
   })
 
   val STATE = RegInit(p_STABLE)
-  val PSTATE = RegInit(0.U(N.W))
-  val PREV_PSTATE = RegInit(0.U(N.W))
+  val PSTATE = RegInit(0.U(M.W))
+  val PREV_PSTATE = RegInit(0.U(M.W))
   val PREQ = RegInit(LOW)
-  val RESETn = RegInit(LOW)
+  val RESETn = RegInit(HIGH)
 
   switch(STATE) {
     is(p_STABLE) {
