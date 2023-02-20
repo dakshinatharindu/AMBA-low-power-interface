@@ -13,8 +13,52 @@ class Controller extends Module {
     val PACCEPT = Input(Bool())
     val PDENY = Input(Bool())
     val RESETn = Output(Bool())
+
+    val req = Input(Bool())
+    val state = Input(UInt(M.W))
   })
 
-  val STATE = RegInit(p_RESET)
+  val STATE = RegInit(p_STABLE)
+  val PSTATE = RegInit(0.U(N.W))
+  val PREV_PSTATE = RegInit(0.U(N.W))
+  val PREQ = RegInit(LOW)
+  val RESETn = RegInit(LOW)
 
+  switch(STATE) {
+    is(p_STABLE) {
+      when(io.req) {
+        PREQ := HIGH
+        PSTATE := io.state
+        PREV_PSTATE := PSTATE
+        STATE := p_REQUEST
+      }
+    }
+
+    is(p_REQUEST) {
+      when(io.PACCEPT) {
+        PREQ := LOW
+        STATE := p_COMPLETE
+      }.elsewhen(io.PDENY) {
+        PREQ := LOW
+        PSTATE := PREV_PSTATE
+        STATE := p_CONTINUE
+      }
+    }
+
+    is(p_COMPLETE) {
+      when(io.PACCEPT === LOW) {
+        STATE := p_STABLE
+      }
+    }
+
+    is(p_CONTINUE) {
+      when(io.PDENY === LOW) {
+        STATE := p_STABLE
+      }
+    }
+  }
+
+  io.PREQ := PREQ
+  io.PSTATE := PSTATE
+  io.RESETn := RESETn
 }
