@@ -15,11 +15,6 @@ class SPCTest extends AnyFlatSpec with ChiselScalatestTester {
       dut.clock.step()
       dut.clock.step()
       dut.clock.step()
-      //   dut.io.PDENY.poke(HIGH)
-      //   dut.clock.step()
-      println("PREQ : " + dut.io.PREQ.peek().toString())
-      println("PSTATE : " + dut.io.PSTATE.peek().toString())
-      println("PACCEPT : " + dut.io.PACCEPT.peek().toString())
     }
   }
 }
