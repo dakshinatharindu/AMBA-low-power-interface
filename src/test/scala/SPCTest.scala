@@ -9,6 +9,8 @@ import amba.Constants._
 class SPCTest extends AnyFlatSpec with ChiselScalatestTester {
   "SPC" should "pass" in {
     test(new SPC) { dut =>
+      dut.clock.step()
+      dut.clock.step()
       dut.io.req.poke(HIGH)
       dut.io.state.poke(2.U)
       dut.clock.step()

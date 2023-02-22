@@ -23,17 +23,17 @@ class Device extends Module {
   switch(STATE) {
     is(p_STABLE) {
       when(io.PREQ) {
-        PACCEPT := HIGH
-        PSTATE := io.PSTATE
-        // PDENY := HIGH
+        // PACCEPT := HIGH
+        // PSTATE := io.PSTATE
+        PDENY := HIGH
         STATE := p_ACCEPT
       }
     }
 
     is(p_ACCEPT) {
       when(io.PREQ === LOW) {
-        PACCEPT := LOW
-        // PDENY := LOW
+        // PACCEPT := LOW
+        PDENY := LOW
         STATE := p_STABLE
       }
     }

@@ -46,6 +46,8 @@ class Tester extends Module {
         assert(PDENY === LOW, "PDENY is LOW at PACCEPT rising edge")
         STATE := p_ACCEPT
       }.elsewhen(PDENY) {
+        assert(PREQ === HIGH, "PREQ is HIGH at PDENY rising edge")
+        assert(PACCEPT === LOW, "PACCEPT is LOW at PDENY rising edge")
         STATE := p_DENIED
       }
     }
@@ -60,14 +62,26 @@ class Tester extends Module {
 
     is(p_DENIED) {
       when(PREQ === LOW) {
+        assert(PDENY === HIGH, "PDENY is HIGH at PREQ falling edge")
+        assert(PACCEPT === LOW, "PACCEPT is LOW at PREQ falling edge")
+        assert(PSTATE === PREV_PSTATE, "PSTATE is changed back to PREV_STATE")
+        CURRENT_PSTATE := PREV_PSTATE
         STATE := p_CONTINUE
       }
     }
 
-    is(p_COMPLETE){
+    is(p_COMPLETE) {
       when(PACCEPT === LOW) {
         assert(PREQ === LOW, "PREQ is LOW at PACCEPT falling edge")
-        assert(PDENY === LOW, "PDENY is LOW at PACCEPT falling edge") 
+        assert(PDENY === LOW, "PDENY is LOW at PACCEPT falling edge")
+        STATE := p_STABLE
+      }
+    }
+
+    is(p_CONTINUE) {
+      when(PDENY === LOW) {
+        assert(PREQ === LOW, "PREQ is LOW at PDENY falling edge")
+        assert(PACCEPT === LOW, "PACCEPT is LOW at PDENY falling edge")
         STATE := p_STABLE
       }
     }
