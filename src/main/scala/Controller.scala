@@ -16,6 +16,7 @@ class Controller extends Module {
 
     val req = Input(Bool())
     val state = Input(UInt(M.W))
+    val rst = Input(Bool())
   })
 
   val STATE = RegInit(p_STABLE)
@@ -60,5 +61,5 @@ class Controller extends Module {
 
   io.PREQ := PREQ
   io.PSTATE := PSTATE
-  io.RESETn := RESETn
+  io.RESETn := io.rst
 }

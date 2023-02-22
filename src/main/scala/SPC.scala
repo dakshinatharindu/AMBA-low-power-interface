@@ -9,6 +9,7 @@ class SPC extends Module {
   val io = IO(new Bundle {
     val req = Input(Bool())
     val state = Input(UInt(M.W))
+    val rst = Input(Bool())
   })
 
   val controller = Module(new Controller)
@@ -17,6 +18,7 @@ class SPC extends Module {
 
   controller.io.req := io.req
   controller.io.state := io.state
+  controller.io.rst := io.rst
   controller.io.PACTIVE := device.io.PACTIVE
   controller.io.PACCEPT := device.io.PACCEPT
   controller.io.PDENY := device.io.PDENY

@@ -28,17 +28,16 @@ class Tester extends Module {
 
   switch(STATE) {
     is(p_STABLE) {
-      when(RESETn === LOW){
+      when(RESETn === LOW) {
         assert(
           PACCEPT === LOW && PDENY === LOW,
-          "PACCEPT and PDENY are at RESETn falling edge"
+          "PACCEPT and PDENY are LOW at RESETn falling edge"
         )
         STATE := p_RESET
-      }
-      when(PREQ) {
+      }.elsewhen(PREQ) {
         assert(
           PACCEPT === LOW && PDENY === LOW,
-          "PACCEPT and PDENY are at PREQ rising edge"
+          "PACCEPT and PDENY are LOW at PREQ rising edge"
         )
         STATE := p_REQUEST
         CURRENT_PSTATE := PSTATE
@@ -92,19 +91,19 @@ class Tester extends Module {
       }
     }
 
-    is (p_RESET){
+    is(p_RESET) {
       when(PREQ && RESETn) {
         assert(
           PACCEPT === LOW && PDENY === LOW,
-          "PACCEPT and PDENY are at RESETn rising edge"
+          "PACCEPT and PDENY are LOW at RESETn rising edge"
         )
         STATE := p_REQUEST
         CURRENT_PSTATE := PSTATE
         PREV_PSTATE := CURRENT_PSTATE
-      }.elsewhen(PREQ === LOW && RESETn){
+      }.elsewhen(PREQ === LOW && RESETn) {
         assert(
           PACCEPT === LOW && PDENY === LOW,
-          "PACCEPT and PDENY are at RESETn rising edge"
+          "PACCEPT and PDENY are LOW at RESETn rising edge"
         )
         STATE := p_STABLE
       }
