@@ -15,6 +15,8 @@ class SPCTest extends AnyFlatSpec with ChiselScalatestTester {
       dut.clock.step()
       dut.clock.step()
       dut.clock.step()
+      dut.clock.step()
+      dut.clock.step()
     }
   }
 }

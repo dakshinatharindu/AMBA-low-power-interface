@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import chisel3.stage._
 import amba.Constants._
+import chisel3.experimental.verification
 
 class Tester extends Module {
   val io = IO(new Bundle {
@@ -28,39 +29,47 @@ class Tester extends Module {
 
   switch(STATE) {
     is(p_STABLE) {
-      assert(PACCEPT === LOW, "PACCEPT is HIGH at STABLE state")
-      assert(PDENY === LOW, "PDENY is HIGH at STABLE state")
-
-      when(PREQ){
+      when(PREQ) {
+        assert(
+          PACCEPT === LOW && PDENY === LOW,
+          "PACCEPT and PDENY are at PREQ rising edge"
+        )
         STATE := p_REQUEST
         CURRENT_PSTATE := PSTATE
         PREV_PSTATE := CURRENT_PSTATE
       }
     }
 
-    is (p_REQUEST){
-        assert(PREQ === HIGH, "PREQ should be kept HIGH at REQUEST state")
-        when(PACCEPT){
-            STATE := p_ACCEPT
-        }.elsewhen(PDENY){
-            STATE := p_DENIED
-        }
+    is(p_REQUEST) {
+      when(PACCEPT) {
+        assert(PREQ === HIGH, "PREQ is HIGH at PACCEPT rising edge")
+        assert(PDENY === LOW, "PDENY is LOW at PACCEPT rising edge")
+        STATE := p_ACCEPT
+      }.elsewhen(PDENY) {
+        STATE := p_DENIED
+      }
     }
 
-    is (p_ACCEPT){
-        assert(PACCEPT === HIGH, "PACCEPT should be kept HIGH at ACCEPT state")
-        assert(PDENY === LOW, "PDENY should be kept LOW at ACCEPT state")
-        when(PREQ === LOW){
-            STATE := p_COMPLETE
-        }
+    is(p_ACCEPT) {
+      when(PREQ === LOW) {
+        assert(PACCEPT === HIGH, "PACCEPT is HIGH at PREQ falling edge")
+        assert(PDENY === LOW, "PDENY is LOW at PREQ falling edge")
+        STATE := p_COMPLETE
+      }
     }
 
-    is (p_DENIED){
-        assert(PACCEPT === LOW, "PACCEPT should be kept LOW at DENIED state")
-        assert(PDENY === HIGH, "PDENY should be kept HIGH at DENIED state")
-        when(PREQ === LOW){
-            STATE := p_CONTINUE
-        }
+    is(p_DENIED) {
+      when(PREQ === LOW) {
+        STATE := p_CONTINUE
+      }
+    }
+
+    is(p_COMPLETE){
+      when(PACCEPT === LOW) {
+        assert(PREQ === LOW, "PREQ is LOW at PACCEPT falling edge")
+        assert(PDENY === LOW, "PDENY is LOW at PACCEPT falling edge") 
+        STATE := p_STABLE
+      }
     }
   }
 }
