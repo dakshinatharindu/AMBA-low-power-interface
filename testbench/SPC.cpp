@@ -9,7 +9,9 @@ vluint64_t sim_time = 0;
 #define MAX_SIM_TIME 20
 
 int main(int argc, char** argv, char** env) {
-    VSPC* dut = new VSPC;
+    VerilatedContext* contextp = new VerilatedContext;
+    contextp->commandArgs(argc, argv);
+    VSPC* dut = new VSPC{contextp};
 
     Verilated::traceEverOn(true);
     VerilatedVcdC* m_trace = new VerilatedVcdC;
@@ -22,7 +24,6 @@ int main(int argc, char** argv, char** env) {
         dut->eval();
         m_trace->dump(sim_time);
         sim_time++;
-        // printf("%d", dut->SPC__DOT__controller__DOT__STATE);
     }
     printf("DONE!\n");
     m_trace->close();
