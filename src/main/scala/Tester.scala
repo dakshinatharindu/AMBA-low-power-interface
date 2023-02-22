@@ -4,7 +4,6 @@ import chisel3._
 import chisel3.util._
 import chisel3.stage._
 import amba.Constants._
-import chisel3.experimental.verification
 
 class Tester extends Module {
   val io = IO(new Bundle {
@@ -29,6 +28,13 @@ class Tester extends Module {
 
   switch(STATE) {
     is(p_STABLE) {
+      when(RESETn === LOW){
+        assert(
+          PACCEPT === LOW && PDENY === LOW,
+          "PACCEPT and PDENY are at RESETn falling edge"
+        )
+        STATE := p_RESET
+      }
       when(PREQ) {
         assert(
           PACCEPT === LOW && PDENY === LOW,
@@ -82,6 +88,24 @@ class Tester extends Module {
       when(PDENY === LOW) {
         assert(PREQ === LOW, "PREQ is LOW at PDENY falling edge")
         assert(PACCEPT === LOW, "PACCEPT is LOW at PDENY falling edge")
+        STATE := p_STABLE
+      }
+    }
+
+    is (p_RESET){
+      when(PREQ && RESETn) {
+        assert(
+          PACCEPT === LOW && PDENY === LOW,
+          "PACCEPT and PDENY are at RESETn rising edge"
+        )
+        STATE := p_REQUEST
+        CURRENT_PSTATE := PSTATE
+        PREV_PSTATE := CURRENT_PSTATE
+      }.elsewhen(PREQ === LOW && RESETn){
+        assert(
+          PACCEPT === LOW && PDENY === LOW,
+          "PACCEPT and PDENY are at RESETn rising edge"
+        )
         STATE := p_STABLE
       }
     }
