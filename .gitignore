@@ -344,3 +344,7 @@ hs_err_pid*
 .scalafmt.conf
 .vscode/
 project/
+verilog/
+testbench/obj_dir/
+testbench/waveform.vcd
+testbench/-
