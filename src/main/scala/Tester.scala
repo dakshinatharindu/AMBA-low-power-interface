@@ -25,6 +25,7 @@ class Tester extends Module {
   val STATE = RegInit(p_STABLE)
   val PREV_PSTATE = RegInit(0.U(M.W))
   val CURRENT_PSTATE = RegInit(0.U(M.W))
+  val RESET_SCORE = RegInit(LOW)
 
   switch(STATE) {
     is(p_STABLE) {
@@ -33,12 +34,18 @@ class Tester extends Module {
           PACCEPT === LOW && PDENY === LOW,
           "PACCEPT and PDENY are LOW at RESETn falling edge"
         )
+        RESET_SCORE := HIGH
         STATE := p_RESET
       }.elsewhen(PREQ) {
         assert(
           PACCEPT === LOW && PDENY === LOW,
           "PACCEPT and PDENY are LOW at PREQ rising edge"
         )
+        assert(
+          ~(PSTATE === ON && (CURRENT_PSTATE === OFF || CURRENT_PSTATE === MR)) || RESET_SCORE === HIGH,
+          "There should be a RESETn before OFF->ON or MEMRET->ON transitions"
+        )
+        RESET_SCORE := LOW
         STATE := p_REQUEST
         CURRENT_PSTATE := PSTATE
         PREV_PSTATE := CURRENT_PSTATE
@@ -97,6 +104,11 @@ class Tester extends Module {
           PACCEPT === LOW && PDENY === LOW,
           "PACCEPT and PDENY are LOW at RESETn rising edge"
         )
+        assert(
+          ~(PSTATE === ON && (CURRENT_PSTATE === OFF || CURRENT_PSTATE === MR)) || RESET_SCORE === HIGH,
+          "There should be a RESETn before OFF->ON or MEMRET->ON transitions"
+        )
+        RESET_SCORE := LOW
         STATE := p_REQUEST
         CURRENT_PSTATE := PSTATE
         PREV_PSTATE := CURRENT_PSTATE
